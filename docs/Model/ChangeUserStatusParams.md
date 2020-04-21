@@ -1,0 +1,10 @@
+# ChangeUserStatusParams
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**status** | [**\Cyclos\Api\Model\UserStatusEnum**](UserStatusEnum.md) |  | [optional] 
+**comment** | **string** | Comments for this status change | [optional] 
+
+[[Back to Model list]](../../README.md#documentation-for-models) [[Back to API list]](../../README.md#documentation-for-api-endpoints) [[Back to README]](../../README.md)
+
