@@ -1,0 +1,31 @@
+{
+  "name": "bueffelsoft/cyclos-rest-api",
+  "description": "",
+  "keywords": [
+    "cyclos",
+    "php",
+    "rest",
+    "api"
+  ],
+  "homepage": "https://github.com/bueffelSOFT/cyclos-rest-api",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Jakob Schumann",
+      "homepage": "https://www.vrok.de"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "ext-curl": "*",
+    "ext-json": "*",
+    "ext-mbstring": "*",
+    "guzzlehttp/guzzle": "^6.5.3"
+  },
+  "require-dev": {
+    "roave/security-advisories": "dev-master"
+  },
+  "autoload": {
+    "psr-4": { "Cyclos\\Api\\" : "src/" }
+  }
+}
