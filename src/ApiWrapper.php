@@ -60,6 +60,7 @@ class ApiWrapper
      */
     public function createRequest(
         string $resourcePath,
+        string $method = 'GET',
         array $formParams = [],
         array $queryParams = [],
         array $headerParams = [],
@@ -136,7 +137,7 @@ class ApiWrapper
 
         $query = build_query($queryParams);
         return new Request(
-            'GET',
+            $method,
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
             $headers,
             $httpBody
