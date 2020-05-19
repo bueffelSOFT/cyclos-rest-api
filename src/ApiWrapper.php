@@ -64,7 +64,7 @@ class ApiWrapper
         array $formParams = [],
         array $queryParams = [],
         array $headerParams = [],
-        string $body = '',
+        string $body = null,
         bool $multipart = false
     ) : Request
     {
@@ -88,7 +88,8 @@ class ApiWrapper
             if ($httpBody instanceof stdClass && $headers['Content-Type'] === 'application/json') {
                 $httpBody = \GuzzleHttp\json_encode($httpBody);
             }
-        } elseif (count($formParams) > 0) {
+        }
+        elseif (count($formParams) > 0) {
             if ($multipart) {
                 $multipartContents = [];
                 foreach ($formParams as $formParamName => $formParamValue) {
@@ -99,11 +100,11 @@ class ApiWrapper
                 }
                 // for HTTP post (form)
                 $httpBody = new MultipartStream($multipartContents);
-
-            } elseif ($headers['Content-Type'] === 'application/json') {
+            }
+            elseif ($headers['Content-Type'] === 'application/json') {
                 $httpBody = \GuzzleHttp\json_encode($formParams);
-
-            } else {
+            }
+            else {
                 // for HTTP post (form)
                 $httpBody = build_query($formParams);
             }
