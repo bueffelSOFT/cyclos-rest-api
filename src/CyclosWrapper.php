@@ -71,13 +71,14 @@ class CyclosWrapper extends ApiWrapper
      *
      * @param string $user  login name/email/userid, whatever is allowed for normal login
      * @param string $password
+     * @param string $ip    remote address to allow blocking
      * @return array [code => string] on login failure,
      *     [user => [], sessionToken => string, group => []] on success
      *     for possible codes see https://demo.cyclos.org/api/#operations-Sessions-loginUser
      * @throws ApiException when the request failed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function loginUser(string $user, string $password): array
+    public function loginUser(string $user, string $password, string $ip): array
     {
         // we only need this values, for other options see
         // https://demo.cyclos.org/api/#operations-Sessions-loginUser
@@ -86,9 +87,9 @@ class CyclosWrapper extends ApiWrapper
         $formParams = [
             'user'           => $user,
             'password'       => $password,
+            'remoteAddress'  => $ip,
 
             // optional:
-            //'remoteAddress'  => $_SERVER['REMOTE_ADDR'] ?? 'cli',
             //'channel'        => 'main',
             //'sessionTimeout' => [
             //    'amount' => 2,

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  php:
+    build: php
+    container_name: cradev-php
+    volumes:
+      - ../:/var/www/html
+    ports:
+      - 10000:9000
+    environment:
+      XDEBUG_CONFIG: remote_host=host.docker.internal
