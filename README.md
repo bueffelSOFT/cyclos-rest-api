@@ -60,4 +60,12 @@ $data = $wrapper->loginUser('username|userId', 'password', $_SERVER['REMOTE_ADDR
 // get all accounts for a given user, may be filtered by account type
 // (e.g. to specify the currency) 
 $accounts = $wrapper->getUserAccounts("username|userId", 'accountTypeId');
+
+// get all advertisements, may be filtered by owner, status, custom fields, ...
+$ads = $wrapper->getAdvertisements([
+   'owner'        => "-310719030079881031",  
+   'kind'         => 'webshop',
+   'statuses'     => ['active'],
+   'customFields' => 'anzeigenart:co2_compensation',
+]);
 ```

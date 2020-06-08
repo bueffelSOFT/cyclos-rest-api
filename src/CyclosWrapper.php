@@ -66,6 +66,43 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
+     * Returns all advertisements for the given user
+     *
+     * @param array $filters list of filters to apply: {
+     *     //@todo 'user' for Cyclos 4.13+
+     *     'owner'        => 'login_name|id',
+     *     'statuses'     => ['active'],
+     *     'customFields' => 'internal_field_name:field_value',
+     * }
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getAdvertisements(array $filters) : array
+    {
+        $url = "/marketplace";
+        $req = $this->createRequest($url, 'GET', [], $filters);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * @todo WIP
+     */
+    public function createOrder(string $seller, string $buyer, array $items)
+    {
+        $url = "/$seller/orders/";
+        $req = $this->createRequest($url, 'POST', [
+            'draft'    => false,
+            'currency' => 'KB',
+            'buyer'    => $buyer,
+            'items'    => $items,
+        ]);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
      * Tries to login the user in Cyclos.
      * Returns the user data and the created sessionToken on success.
      *
