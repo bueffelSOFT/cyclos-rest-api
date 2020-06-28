@@ -66,6 +66,56 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
+     * Returns the list of all addresses of the given user.
+     * May contain hidden addresses!
+     *
+     * @param string $user
+     * @return mixed
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUserAddresses(string $user)
+    {
+        $url = "/$user/addresses";
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Returns the users default address (or first [public] address, if any)
+     * or NULL if none found.
+     *
+     * @param string $user
+     * @return array|null
+     */
+    public function getUserDefaultAddress(string $user)
+    {
+        $addresses = $this->getUserAddresses($user);
+
+        // return the default address if one is set
+        foreach($addresses as $address) {
+            if (isset($address['defaultAddress']) && $address['defaultAddress']) {
+                return $address;
+            }
+        }
+
+        // else return the first public address
+        foreach($addresses as $address) {
+            if (!isset($address['hidden']) || !$address['hidden']) {
+                return $address;
+            }
+        }
+
+        // else return the first address available
+        if (count($addresses)) {
+            return $addresses[0];
+        }
+
+        return null;
+    }
+
+    /**
      * Returns all advertisements for the given user
      *
      * @param array $filters list of filters to apply: {
@@ -94,9 +144,21 @@ class CyclosWrapper extends ApiWrapper
         $url = "/$seller/orders/";
         $req = $this->createRequest($url, 'POST', [
             'draft'    => false,
-            'currency' => 'KB',
+            'currency' => 'climate_bonus',
             'buyer'    => $buyer,
             'items'    => $items,
+            'deliveryMethod' => [
+                'name' => 'kein Versand nötig', // 'not existent', //
+                'price' => 0,
+                'maxTime' => ['amount' => 1, 'field' => 'days'],
+            ],
+            'deliveryAddress' => [
+                'street' => 'Schönfelder',
+                'buildingNumber' => '12',
+                'zip' => '01099',
+                'city' => 'DD',
+                'country'=> 'DE',
+            ],
         ]);
         $res = $this->doRequest($req);
         return $res[0];
