@@ -217,4 +217,30 @@ class CyclosWrapper extends ApiWrapper
 
         return $res[0];
     }
+
+    public function getOperations(string $owner = 'system')
+    {
+        $url = "/$owner/operations/";
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Execute an operation for system or on a given user.
+     *
+     * @param string $operation operation ID or internal name
+     * @param string $owner "system"|user id|login name
+     * @param array $parameters [formParameters => [...], confirmationPassword, ...]
+     * @return mixed
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function runOperations(string $operation, string $owner = 'system', array $parameters = [])
+    {
+        $url = "/$owner/operations/$operation/run";
+        $req = $this->createRequest($url, 'POST', $parameters);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
 }
