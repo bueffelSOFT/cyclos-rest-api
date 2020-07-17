@@ -165,6 +165,92 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
+     * Adds the given item to the authenticated users shopping cart.
+     *
+     * @param string $item  item internal name or "productnumber@user"
+     * @param float $quantity   int or float
+     * @return array [0 => number of items in the cart]
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function addItemToCart(string $item, float $quantity)
+    {
+        $url = "/shopping-carts/items/$item";
+        $req = $this->createRequest($url, 'POST', [], [
+            'quantity' => $quantity,
+        ]);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Returns the list of shopping carts currenty existing for the given user,
+     * one for each seller & currency.
+     *
+     * @return array    [0 => [
+     *      seller => [...],
+     *      currency => [...],
+     *      insufficientBalance => bool,
+     *      items => [...]
+     *  ]]
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getShoppingCarts()
+    {
+        $url = "/shopping-carts";
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    public function getCheckoutData(string $cartId)
+    {
+        $url = "/shopping-carts/$cartId/data-for-checkout";
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Checks out a shopping cart given by its ID.
+     *
+     * @param string $cartId
+     * @param array $details    [deliveryAddress, deliveryMethod, paymentType, ...]
+     * @param string $confirmationPassword  password of the user if necessary
+     * @return array    [0 => remaining number of items in all remaining carts]
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function checkoutShoppingCart(string $cartId, array $details, string $confirmationPassword = null)
+    {
+        $url = "/shopping-carts/$cartId/checkout";
+        $headers = [];
+        if ($confirmationPassword) {
+            $headers['confirmationPassword'] = $confirmationPassword;
+        }
+        $req = $this->createRequest($url, "POST", $details, [], $headers);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Deletes a shopping cart given by its ID for the authenticated user.
+     *
+     * @param string $cartId
+     * @return array    [0 => remaining number of items in all remaining carts]
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function deleteShoppingCart(string $cartId)
+    {
+        $url = "/shopping-carts/$cartId";
+        $req = $this->createRequest($url, "DELETE");
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
      * Tries to login the user in Cyclos.
      * Returns the user data and the created sessionToken on success.
      *
@@ -218,6 +304,15 @@ class CyclosWrapper extends ApiWrapper
         return $res[0];
     }
 
+    /**
+     * Retrieve a list of custom operations that are available for execution
+     * as the currently authenticated user for either system or a given user.
+     *
+     * @param string $owner "system" | user id | login name
+     * @return mixed
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getOperations(string $owner = 'system')
     {
         $url = "/$owner/operations/";
@@ -239,6 +334,19 @@ class CyclosWrapper extends ApiWrapper
     public function runOperations(string $operation, string $owner = 'system', array $parameters = [])
     {
         $url = "/$owner/operations/$operation/run";
+        $req = $this->createRequest($url, 'POST', $parameters);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    public function postCustomWebservice(string $path, array $parameters = [])
+    {
+        // @todo das funktioniert nur wenn _nicht_ /api an der Host URL
+        // hängt, also muss man entweder einen neuen client mit gekürztem
+        // config->setHost() verwenden oder per default immer /api in allen
+        // wrapper methoden verwenden und immer nur die gekürzte URL in der config
+        // angeben
+        $url = "/run/$path";
         $req = $this->createRequest($url, 'POST', $parameters);
         $res = $this->doRequest($req);
         return $res[0];

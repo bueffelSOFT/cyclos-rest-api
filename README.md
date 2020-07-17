@@ -68,4 +68,25 @@ $ads = $wrapper->getAdvertisements([
    'statuses'     => ['active'],
    'customFields' => 'anzeigenart:co2_compensation',
 ]);
+
+// add an item with the given quantity to the current users shopping cart
+$items = $wrapper->addItemToCart("-4922405048507268931", 1.2);
+
+// get a list of all carts for the current user (one per seller & currency)
+$carts = $res = $wrapper->getShoppingCarts();
+
+// remove a shopping cart, to cancel the process
+$remainingData = $wrapper->deleteShoppingCart('-4922405048507268930');
+
+// get data required to complete the sale, returns the current
+// users addresses, possible delivery methods & payment types etc.
+$data = $wrapper->getCheckoutData('-4922405048507268930');
+
+// checkout the given card, using the fetched data, this creates an order, 
+// waiting to be accepted by the seller
+$remainingData = $wrapper->checkoutShoppingCart('-4922405048507268930', [
+    'deliveryAddress' => $data['addresses'][0],
+    'deliveryMethod' => $data['deliveryMethods'][0]['id'],
+    'paymentType' => $data['paymentTypes'][0]['id'],
+]);
 ```
