@@ -137,6 +137,22 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
+     * Returns details for the given advertisment.
+     *
+     * @param string $ad    ID or "product_number@user_identifier"
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getAdvertisement(string $ad) : array
+    {
+        $url = "/marketplace/$ad";
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
      * @todo WIP
      */
     public function createOrder(string $seller, string $buyer, array $items)
@@ -204,6 +220,16 @@ class CyclosWrapper extends ApiWrapper
         return $res[0];
     }
 
+    /**
+     * Returns data about the cart (total price etc), the current user (addresses)
+     * and the seller (possible payment types, delivery methods) that is required
+     * to checkout the cart.
+     *
+     * @param string $cartId
+     * @return mixed
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
     public function getCheckoutData(string $cartId)
     {
         $url = "/shopping-carts/$cartId/data-for-checkout";

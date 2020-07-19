@@ -13,7 +13,10 @@ any API, it has no endpoint specific functions / models.
 ```
 $config = Cyclos\Api\Configuration::getDefaultConfiguration()
     ->setHost('https://cyclos-domain.tld/{network/}api')
-    ->setApiKey('Access-Client-Token', '{client-tag}{access-token}');
+    ->setApiKey('Access-Client-Token', '{client-tag}{access-token}')
+    // or via the session token if one already exists for the end user:
+    //->setApiKey('Session-Token', '{session-token}')
+;
 $wrapper = new \Cyclos\Api\ApiWrapper($config);
 
 // see createRequest() doc for more parameters
@@ -82,7 +85,7 @@ $remainingData = $wrapper->deleteShoppingCart('-4922405048507268930');
 // users addresses, possible delivery methods & payment types etc.
 $data = $wrapper->getCheckoutData('-4922405048507268930');
 
-// checkout the given card, using the fetched data, this creates an order, 
+// checkout the given cart, using the fetched data, this creates an order, 
 // waiting to be accepted by the seller
 $remainingData = $wrapper->checkoutShoppingCart('-4922405048507268930', [
     'deliveryAddress' => $data['addresses'][0],
