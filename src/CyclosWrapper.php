@@ -137,7 +137,7 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
-     * Returns details for the given advertisment.
+     * Returns details for the given advertisement.
      *
      * @param string $ad    ID or "product_number@user_identifier"
      * @return array
