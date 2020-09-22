@@ -110,6 +110,11 @@ class ApiWrapper
             }
         }
 
+        // this endpoint requires OAuth authentication
+        $accessToken = $this->config->getAccessToken();
+        if ($accessToken !== null ) {
+            $headers['Authorization'] = 'Bearer ' . $accessToken;
+        }
         // this endpoint requires API key authentication
         $apiKey = $this->config->getApiKeyWithPrefix('Access-Client-Token');
         if ($apiKey !== null) {
