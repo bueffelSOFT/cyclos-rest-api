@@ -1,6 +1,7 @@
 {
   "name": "bueffelsoft/cyclos-rest-api",
-  "description": "",
+  "type": "library",
+  "description": "PHP client for the Cyclos REST API",
   "keywords": [
     "cyclos",
     "php",
@@ -8,7 +9,7 @@
     "api"
   ],
   "homepage": "https://github.com/bueffelSOFT/cyclos-rest-api",
-  "license": "proprietary",
+  "license": "MIT",
   "authors": [
     {
       "name": "Jakob Schumann",

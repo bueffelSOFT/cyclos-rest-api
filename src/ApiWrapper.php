@@ -116,18 +116,23 @@ class ApiWrapper
             }
         }
 
+        // this endpoint requires OAuth authentication
+        $accessToken = $this->config->getAccessToken();
+        if ($accessToken !== null ) {
+            $headers['Authorization'] = 'Bearer ' . $accessToken;
+        }
         // this endpoint requires API key authentication
         $apiKey = $this->config->getApiKeyWithPrefix('Access-Client-Token');
-        if ($apiKey !== null) {
+        if ($apiKey) {
             $headers['Access-Client-Token'] = $apiKey;
         }
         // this endpoint requires HTTP basic authentication
-        if ($this->config->getUsername() !== null || $this->config->getPassword() !== null) {
+        if ($this->config->getUsername() || $this->config->getPassword()) {
             $headers['Authorization'] = 'Basic ' . base64_encode($this->config->getUsername() . ":" . $this->config->getPassword());
         }
         // this endpoint requires API key authentication
         $apiKey = $this->config->getApiKeyWithPrefix('Session-Token');
-        if ($apiKey !== null) {
+        if ($apiKey) {
             $headers['Session-Token'] = $apiKey;
         }
 

@@ -1,8 +1,8 @@
 version: '3'
 services:
-  php:
+  cra-php:
     build: php
-    container_name: cradev-php
+    container_name: cra-php
     volumes:
       - ../:/var/www/html
     ports:

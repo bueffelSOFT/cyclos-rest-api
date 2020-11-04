@@ -1,10 +1,13 @@
 FROM vrokdd/php:symfony
 
+# for composer
+RUN apt-get update && apt-get -y install zip git
+
+# for debugging directly in an IDE
 RUN pecl install xdebug-2.8.0
 RUN docker-php-ext-enable xdebug
 
-COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint
-RUN chmod +x /usr/local/bin/docker-entrypoint
+COPY ./install-composer.sh /tmp/
+RUN /tmp/install-composer.sh
 
-ENTRYPOINT ["docker-entrypoint"]
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
+#CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/supervisord.conf"]
