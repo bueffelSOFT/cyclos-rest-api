@@ -16,6 +16,12 @@ use function GuzzleHttp\Psr7\build_query;
 class ApiWrapper
 {
     /**
+     * Timeout in seconds per request
+     * @var integer
+     */
+    const TIMEOUT = 20;
+    
+    /**
      * @var ClientInterface
      */
     protected $client;
@@ -223,7 +229,7 @@ class ApiWrapper
      */
     protected function createHttpClientOption()
     {
-        $options = [];
+        $options = ['timeout' => self::TIMEOUT ];
         if ($this->config->getDebug()) {
             $options[RequestOptions::DEBUG] = fopen($this->config->getDebugFile(), 'ab');
             if (!$options[RequestOptions::DEBUG]) {
