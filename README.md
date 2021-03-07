@@ -1,9 +1,15 @@
 # Cyclos REST-API Client
 
+[![Latest Stable Version](https://poser.pugx.org/bueffelsoft/cyclos-rest-api/v/stable.png)](https://packagist.org/packages/bueffelsoft/cyclos-rest-api) [![License](https://poser.pugx.org/bueffelsoft/cyclos-rest-api/license.png)](https://packagist.org/packages/bueffelsoft/cyclos-rest-api)
+
 Use this as dependency in your project instead of writing your own client.
 Auto-generation via swagger codegen (currently, 2020-05-06) produces no usable result.
 Always use Access-Tokens instead of username//password for best security
 and easy blocking of individual clients!
+
+```shell
+composer require bueffelsoft/cyclos-rest-api
+```
 
 ## Usage ApiWrapper
 
