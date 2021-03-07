@@ -48,19 +48,52 @@ class CyclosWrapper extends ApiWrapper
      * Returns all available accounts for the given user.
      *
      * @param string $user  id/login name
-     * @param string|null $type internal name or ID of the account type to filter for
      * @return array
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getUserAccounts(string $user, string $type = null): array
+    public function getUserAccounts(string $user): array
     {
         $url = "/$user/accounts";
-        if ($type) {
-            $url .= "/$type";
-        }
 
         $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Returns the account of the given type for the given user.
+     *
+     * @param string $user  id/login name
+     * @param string $type internal name or ID of the account type to filter for
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUserAccountByType(string $user, string $type): array
+    {
+        $url = "/$user/accounts/$type";
+
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Returns the history the account of the given type for the given user.
+     *
+     * @param string $user      id/login name
+     * @param string $type      internal name or ID of the account type to filter for
+     * @param array $filters    additional filters
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUserAccountHistory(string $user, string $type, array $filters = []): array
+    {
+        $url = "/$user/accounts/$type/history";
+
+        $req = $this->createRequest($url, 'GET', [], $filters);
         $res = $this->doRequest($req);
         return $res[0];
     }
