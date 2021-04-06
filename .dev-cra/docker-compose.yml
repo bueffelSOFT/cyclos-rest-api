@@ -1,0 +1,9 @@
+version: '3'
+services:
+  cra-php:
+    build: php
+    container_name: cra-php
+    volumes:
+      - /phpstorm/CyclosRestAPI/:/var/www/html
+    extra_hosts:
+      - "host.vbox.internal:192.168.178.47"
