@@ -9,20 +9,45 @@ class CyclosWrapper extends ApiWrapper
      * Retrieves the list of visible (to the access client) users.
      *
      * @param array $groups return only users in this group(s)
+     * @param array $states return only uses with this states
      * @return array
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getUsers($groups = []) : array
+    public function getUsers(
+        array $groups = [],
+        array $states = [],
+        int $page = 0
+    ): array
     {
-        $filters = [];
+        $filters = [
+            'page'         => $page,
+            'includeGroup' => true,
+            //'addressResult' => 'all',
+
+            // @todo currently uses the default page size of Cyclos (40)
+            //'pageSize'     => 10,
+        ];
+
         if (count($groups)) {
             $filters['groups'] = $groups;
+        }
+        if (count($states)) {
+            $filters['statuses'] = $states;
         }
 
         $req = $this->createRequest('/users', 'GET', [], $filters);
         $res = $this->doRequest($req);
-        return $res[0];
+
+        $data = [
+            'users'       => $res[0],
+            'page'        => $res[2]['X-Current-Page'][0] ?? null,
+            'pageSize'    => $res[2]['X-Page-Size'][0] ?? null,
+            'total'       => $res[2]['X-Total-Count'][0] ?? null,
+            'hasNextPage' => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
+        ];
+
+        return $data;
     }
 
     /**
@@ -58,6 +83,8 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
+        // no paging for user accounts -> no need to evaluate headers
         return $res[0];
     }
 
@@ -76,6 +103,8 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
+        // a user can only have one account per type -> 0 or 1 result
         return $res[0];
     }
 
@@ -95,7 +124,42 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url, 'GET', [], $filters);
         $res = $this->doRequest($req);
-        return $res[0];
+
+        $data = [
+            'transactions' => $res[0],
+            'page'         => $res[2]['X-Current-Page'][0] ?? null,
+            'pageSize'     => $res[2]['X-Page-Size'][0] ?? null,
+            'total'        => $res[2]['X-Total-Count'][0] ?? null,
+            'hasNextPage'  => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
+        ];
+
+        return $data;
+    }
+
+    /**
+     * Searches for transfers over multiple accounts.
+     *
+     * @param array $filters    filters like transferTypes, datePeriod, ...
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getTransfers(array $filters = []): array
+    {
+        $url = "/transfers/";
+
+        $req = $this->createRequest($url, 'GET', [], $filters);
+        $res = $this->doRequest($req);
+
+        $data = [
+            'transactions' => $res[0],
+            'page'         => $res[2]['X-Current-Page'][0] ?? null,
+            'pageSize'     => $res[2]['X-Page-Size'][0] ?? null,
+            'total'        => $res[2]['X-Total-Count'][0] ?? null,
+            'hasNextPage'  => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
+        ];
+
+        return $data;
     }
 
     /**
@@ -112,6 +176,8 @@ class CyclosWrapper extends ApiWrapper
         $url = "/$user/addresses";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
+        // no paging for user addresses -> no need to evaluate headers
         return $res[0];
     }
 
@@ -149,11 +215,73 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
+     * Returns all available agreements for the given user.
+     *
+     * @param string $user  id/login name
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUserAgreements(string $user): array
+    {
+        $url = "/$user/agreements";
+
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+
+        // no paging for user agreements -> no need to evaluate headers
+        return $res[0];
+    }
+
+    /**
+     * Returns data used for searching users. Includes available groups etc.
+     *
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getUserSearchData(): array
+    {
+        $url = "/users/data-for-search";
+
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Returns data used for searching in/with accounts.
+     * Includes available types etc.
+     *
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getAccountSearchData(): array
+    {
+        $url = "/transfers/data-for-search";
+
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    public function setUserStatus(string $user, string $status, string $comment)
+    {
+        $url = "/$user/status/";
+        $req = $this->createRequest($url, 'POST', [
+            "status"  => $status,
+            "comment" => $comment,
+        ]);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
      * Returns all advertisements for the given user
      *
      * @param array $filters list of filters to apply: {
-     *     //@todo 'user' for Cyclos 4.13+
-     *     'owner'        => 'login_name|id',
+     *     'user'         => 'login_name|id',
      *     'statuses'     => ['active'],
      *     'customFields' => 'internal_field_name:field_value',
      * }
@@ -166,6 +294,8 @@ class CyclosWrapper extends ApiWrapper
         $url = "/marketplace";
         $req = $this->createRequest($url, 'GET', [], $filters);
         $res = $this->doRequest($req);
+
+        // @todo paging?
         return $res[0];
     }
 
@@ -324,7 +454,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function loginUser(string $user, string $password, string $ip): array
     {
-        // we only need this values, for other options see
+        // we only need these values, for other options see
         // https://demo.cyclos.org/api/#operations-Sessions-loginUser
         $fields = ['user', 'group', 'sessionToken'];
 
@@ -377,6 +507,8 @@ class CyclosWrapper extends ApiWrapper
         $url = "/$owner/operations/";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
+        // @todo paging?
         return $res[0];
     }
 
@@ -409,5 +541,52 @@ class CyclosWrapper extends ApiWrapper
         $req = $this->createRequest($url, 'POST', $parameters);
         $res = $this->doRequest($req);
         return $res[0];
+    }
+
+    public static function parseCustomFields(array $entry): array
+    {
+        $customFields = [];
+        foreach($entry['customValues'] ?? [] as $customValue) {
+            $fieldName = $customValue['field']['internalName'] ?? null;
+            if (!$fieldName) {
+                // failsave
+                continue;
+            }
+
+            switch ($customValue['field']['type'] ?? null)
+            {
+                case 'boolean':
+                    $customFields[$fieldName] =
+                        $customValue['booleanValue'];
+                    break;
+
+                case 'decimal':
+                    $customFields[$fieldName] =
+                        $customValue['decimalValue'];
+                    break;
+
+                case 'singleSelection':
+                    $customFields[$fieldName] =
+                        $customValue['enumeratedValues'][0]['value'];
+                    break;
+
+                case 'url':
+                    $customFields[$fieldName] =
+                        $customValue['stringValue'];
+                    break;
+
+                case 'string':
+                    $customFields[$fieldName] =
+                        $customValue['stringValue'];
+                    break;
+
+                default:
+                    $customFields[$fieldName] =
+                        '[unsupported field type '.($customValue['field']['type'] ?? '-not set-').']';
+                    break;
+            }
+        }
+
+        return $customFields;
     }
 }
