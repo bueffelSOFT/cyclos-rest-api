@@ -137,6 +137,38 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
+     * Returns the balances for all accounts of the given type.
+     *
+     * @param string $accountType  account type id or internal name
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getAccountBalances(
+        string $accountType,
+        array $filters = [],
+        int $page = 0
+    ): array
+    {
+        $url = "/accounts/$accountType/user-balances";
+
+        $filters['page'] = $page;
+
+        $req = $this->createRequest($url, 'GET', [], $filters);
+        $res = $this->doRequest($req);
+
+        $data = [
+            'users'       => $res[0], // because the most properties are from the user
+            'page'        => $res[2]['X-Current-Page'][0] ?? null,
+            'pageSize'    => $res[2]['X-Page-Size'][0] ?? null,
+            'total'       => $res[2]['X-Total-Count'][0] ?? null,
+            'hasNextPage' => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
+        ];
+
+        return $data;
+    }
+
+    /**
      * Searches for transfers over multiple accounts.
      *
      * @param array $filters    filters like transferTypes, datePeriod, ...
@@ -160,6 +192,25 @@ class CyclosWrapper extends ApiWrapper
         ];
 
         return $data;
+    }
+
+    /**
+     * Returns details about a single transaction, including parent/child
+     * transfers (e.g. paid fees).
+     *
+     * @param string $identifier transaction number or ID
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getTransaction(string $identifier): array
+    {
+        $url = "/transactions/$identifier";
+
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+
+        return $res[0];
     }
 
     /**
@@ -214,6 +265,15 @@ class CyclosWrapper extends ApiWrapper
         return null;
     }
 
+    public function uploadUserDocument(string $user, array $params)
+    {
+        $url = "/$user/documents/upload";
+
+        $req = $this->createRequest($url, 'POST', $params, [], [], null, true);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
     /**
      * Returns all available agreements for the given user.
      *
@@ -266,13 +326,73 @@ class CyclosWrapper extends ApiWrapper
         return $res[0];
     }
 
-    public function setUserStatus(string $user, string $status, string $comment)
+    /**
+     * Returns data used for performing payments.
+     *
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getPerformPaymentData(string $owner, string $to = null, string $type = null): array
     {
+        $url = "/$owner/payments/data-for-perform";
+        $query = [];
+        if ($to) {
+            $query['to'] = $to;
+        }
+        if ($type) {
+            $query['type'] = $type;
+        }
+
+        $req = $this->createRequest($url, 'GET', [], $query);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+    /**
+     * Performs a payment.
+     *
+     * @param string $owner user identifier | "system" | "self"
+     * @param string $subject The payment destination (in case of perform payment) or payer (in case of receive payment).
+     * @param float $amount
+     * @param string|null $type payment type ID|internal name
+     * @param string|null $reference message/description for the payment
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function performPayment(string $owner, string $subject, float $amount, string $type = null, string $reference = null): array
+    {
+        $url = "/$owner/payments";
+
+        $params = [
+            'amount' => $amount,
+            'subject' => $subject,
+        ];
+        if ($type) {
+            $params['type'] = $type;
+        }
+        if ($reference) {
+            $params['description'] = $reference;
+        }
+
+        $req = $this->createRequest($url, 'POST', $params);
+        $res = $this->doRequest($req);
+        return $res[0];
+    }
+
+
+    public function setUserStatus(string $user, string $status, string $comment = null)
+    {
+        $params = [
+            'status'  => $status,
+        ];
+        if ($comment) {
+            $params['comment'] = $comment;
+        }
+
         $url = "/$user/status/";
-        $req = $this->createRequest($url, 'POST', [
-            "status"  => $status,
-            "comment" => $comment,
-        ]);
+        $req = $this->createRequest($url, 'POST', $params);
         $res = $this->doRequest($req);
         return $res[0];
     }
@@ -295,8 +415,14 @@ class CyclosWrapper extends ApiWrapper
         $req = $this->createRequest($url, 'GET', [], $filters);
         $res = $this->doRequest($req);
 
-        // @todo paging?
-        return $res[0];
+        $data = [
+            'advertisements' => $res[0],
+            'page'           => $res[2]['X-Current-Page'][0] ?? null,
+            'pageSize'       => $res[2]['X-Page-Size'][0] ?? null,
+            'total'          => $res[2]['X-Total-Count'][0] ?? null,
+            'hasNextPage'    => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
+        ];
+        return $data;
     }
 
     /**
@@ -311,34 +437,6 @@ class CyclosWrapper extends ApiWrapper
     {
         $url = "/marketplace/$ad";
         $req = $this->createRequest($url);
-        $res = $this->doRequest($req);
-        return $res[0];
-    }
-
-    /**
-     * @todo WIP
-     */
-    public function createOrder(string $seller, string $buyer, array $items)
-    {
-        $url = "/$seller/orders/";
-        $req = $this->createRequest($url, 'POST', [
-            'draft'    => false,
-            'currency' => 'climate_bonus',
-            'buyer'    => $buyer,
-            'items'    => $items,
-            'deliveryMethod' => [
-                'name' => 'kein Versand nötig', // 'not existent', //
-                'price' => 0,
-                'maxTime' => ['amount' => 1, 'field' => 'days'],
-            ],
-            'deliveryAddress' => [
-                'street' => 'Schönfelder',
-                'buildingNumber' => '12',
-                'zip' => '01099',
-                'city' => 'DD',
-                'country'=> 'DE',
-            ],
-        ]);
         $res = $this->doRequest($req);
         return $res[0];
     }
@@ -508,7 +606,7 @@ class CyclosWrapper extends ApiWrapper
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
 
-        // @todo paging?
+        // no paging for operations -> no need to evaluate headers
         return $res[0];
     }
 
