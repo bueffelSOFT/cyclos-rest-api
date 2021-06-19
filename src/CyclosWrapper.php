@@ -126,7 +126,7 @@ class CyclosWrapper extends ApiWrapper
         $res = $this->doRequest($req);
 
         $data = [
-            'transactions' => $res[0],
+            'transfers'    => $res[0],
             'page'         => $res[2]['X-Current-Page'][0] ?? null,
             'pageSize'     => $res[2]['X-Page-Size'][0] ?? null,
             'total'        => $res[2]['X-Total-Count'][0] ?? null,
@@ -179,6 +179,50 @@ class CyclosWrapper extends ApiWrapper
     public function getTransfers(array $filters = []): array
     {
         $url = "/transfers/";
+
+        $req = $this->createRequest($url, 'GET', [], $filters);
+        $res = $this->doRequest($req);
+
+        $data = [
+            'transfers'    => $res[0],
+            'page'         => $res[2]['X-Current-Page'][0] ?? null,
+            'pageSize'     => $res[2]['X-Page-Size'][0] ?? null,
+            'total'        => $res[2]['X-Total-Count'][0] ?? null,
+            'hasNextPage'  => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
+        ];
+
+        return $data;
+    }
+
+    /**
+     * Returns details about a single transfer.
+     *
+     * @param string $identifier transfer number or ID
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getTransfer(string $identifier): array
+    {
+        $url = "/transfers/$identifier";
+
+        $req = $this->createRequest($url);
+        $res = $this->doRequest($req);
+
+        return $res[0];
+    }
+
+    /**
+     * Searches for transactions over multiple accounts.
+     *
+     * @param array $filters    filters like transferTypes, datePeriod, ...
+     * @return array
+     * @throws ApiException
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function getTransactions(array $filters = []): array
+    {
+        $url = "/transactions/";
 
         $req = $this->createRequest($url, 'GET', [], $filters);
         $res = $this->doRequest($req);
