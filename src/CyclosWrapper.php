@@ -315,6 +315,7 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url, 'POST', $params, [], [], null, true);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -350,6 +351,7 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -367,6 +369,7 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -390,6 +393,7 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url, 'GET', [], $query);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -422,6 +426,7 @@ class CyclosWrapper extends ApiWrapper
 
         $req = $this->createRequest($url, 'POST', $params);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -438,6 +443,7 @@ class CyclosWrapper extends ApiWrapper
         $url = "/$user/status/";
         $req = $this->createRequest($url, 'POST', $params);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -466,6 +472,7 @@ class CyclosWrapper extends ApiWrapper
             'total'          => $res[2]['X-Total-Count'][0] ?? null,
             'hasNextPage'    => ($res[2]['X-Has-Next-Page'][0] ?? null) === 'true',
         ];
+
         return $data;
     }
 
@@ -482,6 +489,7 @@ class CyclosWrapper extends ApiWrapper
         $url = "/marketplace/$ad";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -501,6 +509,7 @@ class CyclosWrapper extends ApiWrapper
             'quantity' => $quantity,
         ]);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -522,6 +531,7 @@ class CyclosWrapper extends ApiWrapper
         $url = "/shopping-carts";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -540,6 +550,7 @@ class CyclosWrapper extends ApiWrapper
         $url = "/shopping-carts/$cartId/data-for-checkout";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -562,6 +573,7 @@ class CyclosWrapper extends ApiWrapper
         }
         $req = $this->createRequest($url, "POST", $details, [], $headers);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -578,6 +590,7 @@ class CyclosWrapper extends ApiWrapper
         $url = "/shopping-carts/$cartId";
         $req = $this->createRequest($url, "DELETE");
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -664,11 +677,12 @@ class CyclosWrapper extends ApiWrapper
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function runOperations(string $operation, string $owner = 'system', array $parameters = [])
+    public function runOperation(string $operation, string $owner = 'system', array $parameters = [])
     {
         $url = "/$owner/operations/$operation/run";
         $req = $this->createRequest($url, 'POST', $parameters);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
@@ -682,6 +696,7 @@ class CyclosWrapper extends ApiWrapper
         $url = "/run/$path";
         $req = $this->createRequest($url, 'POST', $parameters);
         $res = $this->doRequest($req);
+
         return $res[0];
     }
 
