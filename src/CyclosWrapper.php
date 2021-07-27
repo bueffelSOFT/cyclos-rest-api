@@ -61,7 +61,7 @@ class CyclosWrapper extends ApiWrapper
     public function getUser(string $identifier): array
     {
         $fields = ['!permissions'];
-
+        $identifier = urlencode($identifier);
         $req = $this->createRequest("/users/$identifier", 'GET', [], [
             'fields' => $fields,
         ]);
@@ -79,6 +79,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getUserAccounts(string $user): array
     {
+        $user = urlencode($user);
         $url = "/$user/accounts";
 
         $req = $this->createRequest($url);
@@ -99,6 +100,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getUserAccountByType(string $user, string $type): array
     {
+        $user = urlencode($user);
         $url = "/$user/accounts/$type";
 
         $req = $this->createRequest($url);
@@ -120,6 +122,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getUserAccountHistory(string $user, string $type, array $filters = []): array
     {
+        $user = urlencode($user);
         $url = "/$user/accounts/$type/history";
 
         $req = $this->createRequest($url, 'GET', [], $filters);
@@ -268,6 +271,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getUserAddresses(string $user)
     {
+        $user = urlencode($user);
         $url = "/$user/addresses";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
@@ -311,6 +315,7 @@ class CyclosWrapper extends ApiWrapper
 
     public function uploadUserDocument(string $user, array $params)
     {
+        $user = urlencode($user);
         $url = "/$user/documents/upload";
 
         $req = $this->createRequest($url, 'POST', $params, [], [], null, true);
@@ -329,6 +334,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getUserAgreements(string $user): array
     {
+        $user = urlencode($user);
         $url = "/$user/agreements";
 
         $req = $this->createRequest($url);
@@ -382,6 +388,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getPerformPaymentData(string $owner, string $to = null, string $type = null): array
     {
+        $owner = urlencode($owner);
         $url = "/$owner/payments/data-for-perform";
         $query = [];
         if ($to) {
@@ -411,6 +418,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function performPayment(string $owner, string $subject, float $amount, string $type = null, string $reference = null): array
     {
+        $owner = urlencode($owner);
         $url = "/$owner/payments";
 
         $params = [
@@ -440,6 +448,7 @@ class CyclosWrapper extends ApiWrapper
             $params['comment'] = $comment;
         }
 
+        $user = urlencode($user);
         $url = "/$user/status/";
         $req = $this->createRequest($url, 'POST', $params);
         $res = $this->doRequest($req);
@@ -448,7 +457,7 @@ class CyclosWrapper extends ApiWrapper
     }
 
     /**
-     * Returns all advertisements for the given user
+     * Returns all advertisements for the given filters.
      *
      * @param array $filters list of filters to apply: {
      *     'user'         => 'login_name|id',
@@ -659,6 +668,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function getOperations(string $owner = 'system')
     {
+        $owner = urlencode($owner);
         $url = "/$owner/operations/";
         $req = $this->createRequest($url);
         $res = $this->doRequest($req);
@@ -679,6 +689,7 @@ class CyclosWrapper extends ApiWrapper
      */
     public function runOperation(string $operation, string $owner = 'system', array $parameters = [])
     {
+        $owner = urlencode($owner);
         $url = "/$owner/operations/$operation/run";
         $req = $this->createRequest($url, 'POST', $parameters);
         $res = $this->doRequest($req);
