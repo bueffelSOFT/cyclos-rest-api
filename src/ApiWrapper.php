@@ -147,7 +147,7 @@ class ApiWrapper
             $headers
         );
 
-        $query = Query::query($queryParams);
+        $query = Query::build($queryParams);
         return new Request(
             $method,
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
