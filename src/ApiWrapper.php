@@ -6,12 +6,12 @@ namespace Cyclos\Api;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Query;
 use GuzzleHttp\Psr7\MultipartStream;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use RuntimeException;
 use stdClass;
-use function GuzzleHttp\Psr7\build_query;
 
 class ApiWrapper
 {
@@ -112,7 +112,7 @@ class ApiWrapper
             }
             else {
                 // for HTTP post (form)
-                $httpBody = build_query($formParams);
+                $httpBody = Query::build($formParams);
             }
         }
 
@@ -147,7 +147,7 @@ class ApiWrapper
             $headers
         );
 
-        $query = build_query($queryParams);
+        $query = Query::query($queryParams);
         return new Request(
             $method,
             $this->config->getHost() . $resourcePath . ($query ? "?{$query}" : ''),
