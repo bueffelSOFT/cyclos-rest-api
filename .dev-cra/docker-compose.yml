@@ -4,6 +4,7 @@ services:
     build: php
     container_name: cra-php
     volumes:
-      - /phpstorm/CyclosRestAPI/:/var/www/html
+      # /projects muss in der Virtualbox als Shared Folder gemounted sein
+      - /projects/CyclosRestAPI/:/srv/api
     extra_hosts:
-      - "host.vbox.internal:192.168.178.47"
+      - host.vbox.internal:192.168.56.1 # IP des VM bridge adapters
