@@ -118,7 +118,7 @@ class ApiWrapper
 
         // this endpoint requires OAuth authentication
         $accessToken = $this->config->getAccessToken();
-        if ($accessToken !== null ) {
+        if ($accessToken) {
             $headers['Authorization'] = 'Bearer ' . $accessToken;
         }
         // this endpoint requires API key authentication
