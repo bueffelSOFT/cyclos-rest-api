@@ -17,12 +17,12 @@
     }
   ],
   "require": {
-    "php": "^7.4.9|^8.0",
+    "php": "^8.2",
     "ext-curl": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
-    "guzzlehttp/guzzle": "^6.5.8|^7.4.5",
-    "guzzlehttp/psr7": "^1.8.4|^2.1.1"
+    "guzzlehttp/guzzle": "^7.4.5",
+    "guzzlehttp/psr7": "^2.4.5"
   },
   "require-dev": {
     "roave/security-advisories": "dev-master"
