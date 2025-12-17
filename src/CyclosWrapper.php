@@ -496,12 +496,12 @@ class CyclosWrapper extends ApiWrapper
      *
      * @param string $user id/login name
      * @param string $status active|disabled|blocked|purged
-     * @param string|null $comment (optional) comment for the status log entry
+     * @param ?string $comment (optional) comment for the status log entry
      * @return array
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function setUserStatus(string $user, string $status, string $comment = null): array
+    public function setUserStatus(string $user, string $status, ?string $comment = null): array
     {
         $params = [
             'status'  => $status,
@@ -699,7 +699,7 @@ class CyclosWrapper extends ApiWrapper
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getPerformPaymentData(string $owner, string $to = null, string $type = null): array
+    public function getPerformPaymentData(string $owner, ?string $to = null, ?string $type = null): array
     {
         $owner = urlencode($owner);
         $url = "/$owner/payments/data-for-perform";
@@ -723,13 +723,13 @@ class CyclosWrapper extends ApiWrapper
      * @param string $owner user identifier | "system" | "self"
      * @param string $subject The payment destination (in case of perform payment) or payer (in case of receive payment).
      * @param float $amount
-     * @param string|null $type payment type ID|internal name
-     * @param string|null $reference message/description for the payment
+     * @param ?string $type payment type ID|internal name
+     * @param ?string $reference message/description for the payment
      * @return array
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function performPayment(string $owner, string $subject, float $amount, string $type = null, string $reference = null): array
+    public function performPayment(string $owner, string $subject, float $amount, ?string $type = null, ?string $reference = null): array
     {
         $owner = urlencode($owner);
         $url = "/$owner/payments";
@@ -865,12 +865,12 @@ class CyclosWrapper extends ApiWrapper
      *
      * @param string $cartId
      * @param array $details    [deliveryAddress, deliveryMethod, paymentType, ...]
-     * @param string $confirmationPassword  password of the user if necessary
+     * @param ?string $confirmationPassword  password of the user if necessary
      * @return array    [0 => remaining number of items in all remaining carts]
      * @throws ApiException
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function checkoutShoppingCart(string $cartId, array $details, string $confirmationPassword = null)
+    public function checkoutShoppingCart(string $cartId, array $details, ?string $confirmationPassword = null)
     {
         $url = "/shopping-carts/$cartId/checkout";
         $headers = [];

@@ -36,15 +36,10 @@ class ApiWrapper
      */
     protected $headerSelector;
 
-    /**
-     * @param ClientInterface $client
-     * @param Configuration $config
-     * @param HeaderSelector $selector
-     */
     public function __construct(
-        Configuration $config = null,
-        ClientInterface $client = null,
-        HeaderSelector $selector = null
+        ?Configuration $config = null,
+        ?ClientInterface $client = null,
+        ?HeaderSelector $selector = null
     )
     {
         $this->client = $client ?: new Client();
@@ -60,7 +55,7 @@ class ApiWrapper
      * @param array $formParams     list of elements to send as form
      * @param array $queryParams    query string parameters
      * @param array $headerParams   additional headers
-     * @param string $body          complete body, ignores formParams
+     * @param ?string $body         complete body, ignores formParams
      * @param bool $multipart
      * @return Request
      */
@@ -70,7 +65,7 @@ class ApiWrapper
         array $formParams = [],
         array $queryParams = [],
         array $headerParams = [],
-        string $body = null,
+        ?string $body = null,
         bool $multipart = false
     ) : Request
     {
